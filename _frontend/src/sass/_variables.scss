@@ -1,0 +1,78 @@
+/**
+ * Colors
+ * ============================================================ */
+
+
+// Grayscale
+$gray300:					#FAFAFB;
+$gray400:					#EBECEF;
+$gray500:					#E0E2E6;
+$gray600:					#D6D9DE;
+$gray700:					#A9ABB2;
+$gray800:					#72767F;
+
+// System
+$link:						#356CFA;
+$error:						#FF4D35;
+$warning:					#FFBC27;
+$success:					#00B67A;
+
+// Brand
+$brand-primary:		#3639A4;
+$brand-secondary:	#75E8F0;
+$secondary:				#FFB0A3;
+$cta:							#FF7364;
+
+// Old colors
+$white:	 					#ffffff;
+$light-grey: 			$gray300;
+$grey: 	 					$gray400;
+$dark-grey:				#979eae;
+$black:  					#181C2F;
+$shadow:					#32325d;
+
+$yellow:   				#eba842;
+$red:     				#e56452;
+$green:  					#87d37c;
+$light-green:			#dcf9dd;
+$ui-blue:					$link;
+
+$blue-lighter: 		#F1F5F9;
+$dark-blue:				#3639A4;
+$darker-blue:			darken($dark-blue, 7%);
+$blue:						#75E8F0;
+
+$color-text: 			$black;
+$color-heading: 	$black;
+
+
+$blue-dark: 			$dark-blue;
+
+
+/**
+ * Animation
+ * ============================================================ */
+
+$bezier: cubic-bezier(.19,1,.22,1);
+
+
+
+/**
+ * Typography
+ * ============================================================ */
+
+$plex-sans: 'TT Norms Pro';
+$heading: 'Brown';
+
+
+
+/**
+ * Media queries - breakpoints
+ * ============================================================ */
+
+$grid-breakpoints: (
+	xs:	480px,
+	sm:	768px,
+	md:	992px,
+	lg:	1200px
+);

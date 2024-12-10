@@ -1,0 +1,17 @@
+.vscode
+*.log
+npm-debug.log*
+dist/*
+pids
+*.pid
+*.seed
+.nyc_output
+.lock-wscript
+node_modules
+_frontend/node_modules
+jspm_packages
+.npm
+.node_repl_history
+*.mo
+.php_cs.cache
+.ssh

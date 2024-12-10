@@ -1,0 +1,31 @@
+/**
+ * Shadow
+ * ============================================================ */
+
+ @mixin shadow($size: 'small', $opacity: 1) {
+	@if $size == 'micro' {
+		box-shadow: 0 .2rem .3rem rgba($shadow, (.09 * $opacity)),
+								0 .1rem .2rem rgba($black,  (.01 * $opacity));
+	}
+
+	@if $size == 'small' {
+		box-shadow: 0 .4rem .6rem rgba($shadow, (.11 * $opacity)),
+								0 .1rem .3rem rgba($black,  (.08 * $opacity));
+	}
+
+	@if $size == 'medium' {
+	box-shadow: 0 .7rem 1.4rem rgba($shadow, (.1 * $opacity)),
+							0 .3rem .6rem rgba($black, (.08 * $opacity));
+	}
+
+	@if $size == 'medium-large' {
+		box-shadow: 0 1.5rem 3.5rem rgba($shadow, (.1 * $opacity)),
+								0 .5rem 1.5rem rgba($black, (.08 * $opacity));
+		}
+
+	@if $size == 'large' {
+		box-shadow: 0 5rem 10rem rgba($shadow, (.05 * $opacity)),
+								0 1.5rem 3.5rem rgba($shadow, (.08 * $opacity)),
+								0 .5rem 1.5rem rgba($black, (.05 * $opacity));
+	}
+}
