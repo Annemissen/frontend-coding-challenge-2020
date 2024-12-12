@@ -4,6 +4,7 @@ import { TopSalesView, TopSalesViewProps } from './views/top-sales';
 import { SplashModal } from './widgets/splash-modal';
 import { Header } from './views/header';
 import { SalesConnnectorContext } from '../context/sales-connector'; 
+import { Card } from './widgets/card';
 
 export interface Seller {
 	name: string;
@@ -22,18 +23,17 @@ export const DashBoardView = () => {
 
 	const [mode, setMode] = React.useState<'top' | 'recent'>('recent');
 	const [splash, setSplash] = React.useState<boolean>(false);
-	const [splashMessageList, setSplashMessageList] = React.useState<Array<string>>([]);
+	const [splashMessageList, setSplashMessageList] = React.useState<Array<Sale>>([]);
 
 	const [recentSalesState, setRecentSalesState] = React.useState<Array<Sale>>([]);
 	const [sellersState, setSellersState] = React.useState<Array<Seller>>([]);
+
 
 	React.useEffect(() => {
 		// initialize callback
 		const cb = async (e) => {
 			let user = await store.getUser(e.userId)
 			let product = await store.getProduct(e.productId)
-
-			// console.log('User', user.name, `(${user.id})`, 'sold', product.name, 'with subscription length', e.duration, 'sales value: ', product.unitPrice * e.duration)
 
 			//Recent sales
 			const saleValue = product.unitPrice * e.duration
@@ -52,18 +52,18 @@ export const DashBoardView = () => {
 				addSeller(user.name, user.id, saleValue)
 			}
 
-			setSplashMessageList((prevState) => ([...prevState, `${user.name} sold ${product.name} worth ${saleValue}`]))
+			setSplashMessageList((prevState) => ([...prevState, {name: user.name, productName: product.name,saleValue: saleValue}]))
 
 		}
+
 		hub.registerSalesEventListener(cb)
 
 		return () => hub.unregisterSalesEventListener(cb)
 		
-		
 	}, [sellersState]);
 
 
-	// Timer for notifications
+	// // Timer for notifications
 	React.useEffect(() => {
 		if (splashMessageList.length > 0) {
 			if (!splash){
@@ -75,7 +75,8 @@ export const DashBoardView = () => {
 			}
 		}
 
-	 }, [splash, splashMessageList])
+	 }, [splash, splashMessageList])	
+	 
 
 
 	 // Timer for sellers and sales view
@@ -83,8 +84,8 @@ export const DashBoardView = () => {
 		// The top sellers list should be displayed for a minute, and the most recent sales should only be display for half a minute
 		let halfwayThroughTopSellers = false
 		const interval = setInterval(() => {
-			if (mode === 'recent'){
-				setMode('top')
+			if (mode === "recent"){
+				setMode("top")
 			}
 			else {
 				if (!halfwayThroughTopSellers){
@@ -92,7 +93,7 @@ export const DashBoardView = () => {
 				}
 				else {
 					halfwayThroughTopSellers = false
-					setMode('recent')
+					setMode("recent")
 				}
 			}
 		}, 30000); 
@@ -121,6 +122,7 @@ export const DashBoardView = () => {
 		}]))
 	}
 	
+	
 	const getTop10Sellers = () => {
 		return sellersState.sort(compareSellers).slice(0,10)
 	}
@@ -133,16 +135,25 @@ export const DashBoardView = () => {
 
 	return (
 		<>
-			<div className="flex-auto p-5">
-				<Header />
-				{splash &&
-					<SplashModal text={splashMessageList[0]}/>
-				}
-				{mode === 'recent' ?
-					<RecentSalesView recentSales={recentSalesState}/>
-					: <TopSalesView topSellers={getTop10Sellers()}/>
-				}
+			<div className="flex flex-col p-5">
+				<div className="pb-5">
+					<Header />
 
+					{mode === "recent" ?
+						<RecentSalesView recentSales={recentSalesState}/>
+						: <TopSalesView topSellers={getTop10Sellers()}/>
+					}
+				</div>
+				
+				{splash &&
+					<SplashModal title="New Sale" children={ 
+						<div className="max-w-40 min-w-60">
+							<a className="font-medium">{splashMessageList[0].name}</a> sold <a className="font-medium">{splashMessageList[0].productName}</a>
+							<br></br>
+							<a className="font-medium">Sale value:</a> {splashMessageList[0].saleValue}
+						</div>
+					}/>
+				}
 			</div>
 		</>
 	)
