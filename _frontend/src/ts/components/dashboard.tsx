@@ -32,11 +32,6 @@ export const DashBoardView = () => {
 		[Modes.Top, 1000]
 	]))
 
-	// setModeOptions((prevState) => {
-	// 	return prevState.set(Modes.Recent, 10000)
-	// })
-
-
 	const [mode, setMode] = useState<Modes>(Modes.Recent);
 	// const test = Array.from(modeMap.keys())
 	const [splash, setSplash] = useState<boolean>(false);
@@ -81,7 +76,7 @@ export const DashBoardView = () => {
 	}, [sellersState]);
 
 
-	// // Timer for notifications - TODO: for at fjerne splash: prøv med interval ...
+	// // Timer for notifications
 	useEffect(() => {
 		if (splashMessageList.length > 0) {
 			if (!splash){
@@ -99,6 +94,7 @@ export const DashBoardView = () => {
 
 	 // Timer for sellers and sales view
 	 useEffect(() => {
+		console.log(modeOptions.get(Modes.Top))
 		// The top sellers list should be displayed for a minute, and the most recent sales should only be display for half a minute
 		const interval = setInterval(() => {
 			if (mode === "recent"){
@@ -133,29 +129,35 @@ export const DashBoardView = () => {
 		}]))
 	}
 
+	const changeTopSellerModeTime = () => {
+		console.log('changeTopSellerModeTime')
+		setModeOptions((prevState) => {
+			return prevState.set(Modes.Top, 10000)
+		})
+	}
+
 	return (
-		<>
-			<div className="flex flex-col p-5">
-				<div className="pb-5">
-					<Header />
+		<div className="flex flex-col p-5">
+			<div className="pb-5">
+				<Header />
 
-					{mode === Modes.Recent ?
-						<RecentSalesView recentSales={recentSalesState}/>
-						: <TopSalesView topSellers={sellersState}/>
-					}
-
-				</div>
-				
-				{splash &&
-					<SplashModal title="New Sale" children={ 
-						<div className="max-w-40 min-w-60">
-							<a className="font-medium">{splashMessageList[0].name}</a> sold <a className="font-medium">{splashMessageList[0].productName}</a>
-							<br></br>
-							<a className="font-medium">Sale value:</a> {splashMessageList[0].saleValue.toFixed(2)}
-						</div>
-					}/>
+				{mode === Modes.Recent ?
+					<RecentSalesView recentSales={recentSalesState}/>
+					: <TopSalesView topSellers={sellersState}/>
 				}
 			</div>
-		</>
+
+			<button onClick={changeTopSellerModeTime}>top seller time change</button>
+			
+			{splash &&
+				<SplashModal title="New Sale" children={ 
+					<div className="max-w-40 min-w-60">
+						<a className="font-medium">{splashMessageList[0].name}</a> sold <a className="font-medium">{splashMessageList[0].productName}</a>
+						<br></br>
+						<a className="font-medium">Sale value:</a> {splashMessageList[0].saleValue.toFixed(2)}
+					</div>
+				}/>
+			}
+		</div>
 	)
 }
