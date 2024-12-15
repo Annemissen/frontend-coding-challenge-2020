@@ -10,11 +10,7 @@ export interface RecentSalesViewProps {
 
 
 export const RecentSalesView = ({ recentSales }: RecentSalesViewProps) => {	
-	
-	const tenMostRecentSales = recentSales.length < 10 ? recentSales : recentSales.slice(-10)
-	// console.log(tenMostRecentSales)
-	// const [state, setState] = useState<Array<Sale>>(recentSales)
-	
+		
 	return (
 		<Card>
 			<Card.InsetBody>
