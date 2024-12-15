@@ -9,6 +9,15 @@ export interface TopSalesViewProps {
 
 export const TopSalesView = ({ topSellers }: TopSalesViewProps) => {
 
+	const getTop10Sellers = () => {
+		return topSellers.sort(compareSellers).slice(0,10)
+	}
+
+
+	const compareSellers = (sellerA: Seller, sellerB: Seller) => {
+		return sellerB.totalSalesValue - sellerA.totalSalesValue
+	}
+
 	return (
 		<Card>
 			<Card.InsetBody>
@@ -19,7 +28,7 @@ export const TopSalesView = ({ topSellers }: TopSalesViewProps) => {
 						<Table.Header>Total Sales Value</Table.Header>
 					</Table.Headers>
 					<Table.Body>
-						{topSellers.map((seller, index) => {
+						{getTop10Sellers().map((seller, index) => {
 							return (
 								<Table.Row key={index}>
 									<Table.Cell>{seller.name}</Table.Cell>

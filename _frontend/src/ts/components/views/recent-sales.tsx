@@ -11,6 +11,10 @@ export interface RecentSalesViewProps {
 
 export const RecentSalesView = ({ recentSales }: RecentSalesViewProps) => {	
 	
+	const tenMostRecentSales = recentSales.length < 10 ? recentSales : recentSales.slice(-10)
+	// console.log(tenMostRecentSales)
+	// const [state, setState] = useState<Array<Sale>>(recentSales)
+	
 	return (
 		<Card>
 			<Card.InsetBody>
@@ -22,12 +26,12 @@ export const RecentSalesView = ({ recentSales }: RecentSalesViewProps) => {
 						<Table.Header>Value</Table.Header>
 					</Table.Headers>
 					<Table.Body>
-						{recentSales.map((sale, index) => {
+						{recentSales.slice(-10).map((sale, index) => {
 						return (
 							<Table.Row key={index}>
 								<Table.Cell>{sale.name}</Table.Cell>
 								<Table.Cell>{sale.productName}</Table.Cell>
-								<Table.Cell>{sale.saleValue}</Table.Cell>
+								<Table.Cell>{sale.saleValue.toFixed(2)}</Table.Cell>
 							</Table.Row>
 						)})}
 					</Table.Body>

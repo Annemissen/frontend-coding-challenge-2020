@@ -1,10 +1,9 @@
-import React from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import { RecentSalesView } from './views/recent-sales';
 import { TopSalesView, TopSalesViewProps } from './views/top-sales';
 import { SplashModal } from './widgets/splash-modal';
 import { Header } from './views/header';
 import { SalesConnnectorContext } from '../context/sales-connector'; 
-import { Card } from './widgets/card';
 
 export interface Seller {
 	name: string;
@@ -18,29 +17,49 @@ export interface Sale {
 	saleValue: number;
 }
 
+const enum Modes {
+	Recent = 'recent',
+	Top = 'top'
+}
+
+
 export const DashBoardView = () => {
-	const { hub, store } = React.useContext(SalesConnnectorContext)
+	const { hub, store } = useContext(SalesConnnectorContext)
 
-	const [mode, setMode] = React.useState<'top' | 'recent'>('recent');
-	const [splash, setSplash] = React.useState<boolean>(false);
-	const [splashMessageList, setSplashMessageList] = React.useState<Array<Sale>>([]);
+	// const modeMap = new Map([['recent', 30000], ['top', 60000]])
+	const [modeOptions, setModeOptions] = useState<Map<string,number>>(new Map([
+		[Modes.Recent, 5000], 
+		[Modes.Top, 1000]
+	]))
 
-	const [recentSalesState, setRecentSalesState] = React.useState<Array<Sale>>([]);
-	const [sellersState, setSellersState] = React.useState<Array<Seller>>([]);
+	// setModeOptions((prevState) => {
+	// 	return prevState.set(Modes.Recent, 10000)
+	// })
 
 
-	React.useEffect(() => {
+	const [mode, setMode] = useState<Modes>(Modes.Recent);
+	// const test = Array.from(modeMap.keys())
+	const [splash, setSplash] = useState<boolean>(false);
+	const [splashMessageList, setSplashMessageList] = useState<Array<Sale>>([]);
+
+	const [recentSalesState, setRecentSalesState] = useState<Array<Sale>>([]);
+	const [sellersState, setSellersState] = useState<Array<Seller>>([]);
+
+
+	useEffect(() => {
 		// initialize callback
 		const cb = async (e) => {
 			let user = await store.getUser(e.userId)
 			let product = await store.getProduct(e.productId)
 
+			console.log('User', user.name, 'sold', product.name, 'with subscription value', e.duration * product.unitPrice)
+
+
 			//Recent sales
 			const saleValue = product.unitPrice * e.duration
+			const recentSale: Sale = {name: user.name, productName: product.name, saleValue: saleValue}
 			setRecentSalesState((prevState) => (
-				prevState.length > 9 
-					? [...prevState, {name: user.name, productName: product.name,saleValue: saleValue}].slice(1) 
-					: [...prevState, {name: user.name, productName: product.name, saleValue: saleValue}]
+				[...prevState, recentSale]
 			))
 
 			//Top sellers
@@ -52,8 +71,7 @@ export const DashBoardView = () => {
 				addSeller(user.name, user.id, saleValue)
 			}
 
-			setSplashMessageList((prevState) => ([...prevState, {name: user.name, productName: product.name,saleValue: saleValue}]))
-
+			setSplashMessageList((prevState) => ([...prevState, recentSale]))
 		}
 
 		hub.registerSalesEventListener(cb)
@@ -63,8 +81,8 @@ export const DashBoardView = () => {
 	}, [sellersState]);
 
 
-	// // Timer for notifications
-	React.useEffect(() => {
+	// // Timer for notifications - TODO: for at fjerne splash: prøv med interval ...
+	useEffect(() => {
 		if (splashMessageList.length > 0) {
 			if (!splash){
 				setSplash(true)
@@ -80,23 +98,16 @@ export const DashBoardView = () => {
 
 
 	 // Timer for sellers and sales view
-	 React.useEffect(() => {
+	 useEffect(() => {
 		// The top sellers list should be displayed for a minute, and the most recent sales should only be display for half a minute
-		let halfwayThroughTopSellers = false
 		const interval = setInterval(() => {
 			if (mode === "recent"){
-				setMode("top")
+				setMode(Modes.Top)
 			}
 			else {
-				if (!halfwayThroughTopSellers){
-					halfwayThroughTopSellers = true
-				}
-				else {
-					halfwayThroughTopSellers = false
-					setMode("recent")
-				}
+				setMode(Modes.Recent)
 			}
-		}, 30000); 
+		}, modeOptions.get(mode)); 
 
 		return () => {
 			clearInterval(interval)
@@ -121,17 +132,6 @@ export const DashBoardView = () => {
 			totalSalesValue: saleValue
 		}]))
 	}
-	
-	
-	const getTop10Sellers = () => {
-		return sellersState.sort(compareSellers).slice(0,10)
-	}
-
-
-	const compareSellers = (sellerA: Seller, sellerB: Seller) => {
-		return sellerB.totalSalesValue - sellerA.totalSalesValue
-	}
-
 
 	return (
 		<>
@@ -139,10 +139,11 @@ export const DashBoardView = () => {
 				<div className="pb-5">
 					<Header />
 
-					{mode === "recent" ?
+					{mode === Modes.Recent ?
 						<RecentSalesView recentSales={recentSalesState}/>
-						: <TopSalesView topSellers={getTop10Sellers()}/>
+						: <TopSalesView topSellers={sellersState}/>
 					}
+
 				</div>
 				
 				{splash &&
@@ -150,7 +151,7 @@ export const DashBoardView = () => {
 						<div className="max-w-40 min-w-60">
 							<a className="font-medium">{splashMessageList[0].name}</a> sold <a className="font-medium">{splashMessageList[0].productName}</a>
 							<br></br>
-							<a className="font-medium">Sale value:</a> {splashMessageList[0].saleValue}
+							<a className="font-medium">Sale value:</a> {splashMessageList[0].saleValue.toFixed(2)}
 						</div>
 					}/>
 				}
